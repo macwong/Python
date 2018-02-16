@@ -1,5 +1,5 @@
 #!flask/bin/python
-from flask import Flask, jsonify, abort, make_response
+from flask import Flask, jsonify, abort, make_response, request
 
 app = Flask(__name__)
 
@@ -36,6 +36,22 @@ def get_task(task_id):
     if len(task) == 0:
         abort(404)
     return jsonify({'task': task[0]})
+
+@app.route('/testapi/tasks', methods=['POST'])
+def create_task():
+    json = request.get_json()
+    print(json)
+#    print('title' in request.json)
+    if not json or not 'title' in json:
+        abort(400)
+    task = {
+        'id': tasks[-1]['id'] + 1,
+        'title': json['title'],
+        'description': json.get('description', ""),
+        'done': False
+    }
+    tasks.append(task)
+    return jsonify({'task': task}), 201
 
 if __name__ == '__main__':
     app.run(debug=True)
